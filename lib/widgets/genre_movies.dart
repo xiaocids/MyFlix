@@ -92,9 +92,11 @@ class _GenreMoviesState extends State<GenreMovies> {
               padding: EdgeInsets.only(top: 10.0, bottom: 10.0, right: 10.0),
               child: GestureDetector(
                 onTap: () {
-                  Navigator.push(context, MaterialPageRoute(
-                    builder: (context) => MovieDetailScreen(movie: movies[index])
-                  ));
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              MovieDetailScreen(movie: movies[index])));
                 },
                 child: Column(
                   children: <Widget>[

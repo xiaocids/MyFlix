@@ -16,7 +16,7 @@ class MovieDetail {
       : id = json["id"],
         adult = json["adult"],
         budget = json["budget"],
-        genres = json["genres"],
+        genres = (json["genres"] as List).map((i) => new Genre.fromJson(i)).toList(),
         releaseDate = json["release_date"],
         runtime = json["runtime"];
 }

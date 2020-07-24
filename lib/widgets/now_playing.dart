@@ -4,6 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:my_flix/bloc/get_now_playing_bloc.dart';
 import 'package:my_flix/model/movie.dart';
 import 'package:my_flix/model/movie_response.dart';
+import 'package:my_flix/screens/movie_detail_screen.dart';
 import 'package:page_indicator/page_indicator.dart';
 import 'package:my_flix/style/theme.dart' as Stye;
 
@@ -12,7 +13,7 @@ class NowPlaying extends StatefulWidget {
   _NowPlayingState createState() => _NowPlayingState();
 }
 
-class _NowPlayingState extends State<NowPlaying>{
+class _NowPlayingState extends State<NowPlaying> {
   @override
   void initState() {
     super.initState();
@@ -22,19 +23,19 @@ class _NowPlayingState extends State<NowPlaying>{
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<MovieResponse>(
-      stream: nowPlayingMoviesBloc.subject.stream,
-      builder: (context, AsyncSnapshot<MovieResponse> snapshot) {
-        if(snapshot.hasData) {
-          if(snapshot.data.error != null && snapshot.data.error.length > 0) {
-            return _buildErrorWidget(snapshot.data.error);
+        stream: nowPlayingMoviesBloc.subject.stream,
+        builder: (context, AsyncSnapshot<MovieResponse> snapshot) {
+          if (snapshot.hasData) {
+            if (snapshot.data.error != null && snapshot.data.error.length > 0) {
+              return _buildErrorWidget(snapshot.data.error);
+            }
+            return _buildNowPlayingWidget(snapshot.data);
+          } else if (snapshot.hasError) {
+            return _buildErrorWidget(snapshot.error);
+          } else {
+            return _buildLoadingWidget();
           }
-          return _buildNowPlayingWidget(snapshot.data);
-        } else if (snapshot.hasError) {
-          return _buildErrorWidget(snapshot.error);
-        } else {
-          return _buildLoadingWidget();
-        }
-      });
+        });
   }
 
   Widget _buildLoadingWidget() {
@@ -59,24 +60,20 @@ class _NowPlayingState extends State<NowPlaying>{
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Text("Error occur: $error")
-        ],
+        children: <Widget>[Text("Error occur: $error")],
       ),
     );
   }
 
   Widget _buildNowPlayingWidget(MovieResponse data) {
     List<Movie> movies = data.movies;
-    if(movies.length == 0) {
+    if (movies.length == 0) {
       return Container(
         width: MediaQuery.of(context).size.width,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            Text("No movies")
-          ],
+          children: <Widget>[Text("No movies")],
         ),
       );
     } else {
@@ -93,64 +90,77 @@ class _NowPlayingState extends State<NowPlaying>{
               scrollDirection: Axis.horizontal,
               itemCount: movies.take(5).length,
               itemBuilder: (context, index) {
-                return Stack(
-                  children: <Widget>[
-                    Container(
-                      width: MediaQuery.of(context).size.width,
-                      height: 220,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.rectangle,
-                        image: DecorationImage(image: NetworkImage("https://image.tmdb.org/t/p/original/" + movies[index].backPosterPath),
-                        fit: BoxFit.cover)
-                      ),
-                    ),
-                    Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(colors: [
-                          Stye.Colors.mainColor.withOpacity(1.0),
-                          Stye.Colors.mainColor.withOpacity(0.0)
-                        ],
-                        begin: Alignment.bottomCenter,
-                          end: Alignment.topCenter,
-                          stops: [
-                            0.0,
-                            0.3
-                          ]
-                        )
-                      ),
-                    ),
-                    Positioned(
-                      top: 0,
-                      bottom: 0,
-                      right: 0,
-                      left: 0,
-                      child: Icon(FontAwesomeIcons.playCircle, color: Stye.Colors.secondColor, size: 40.0,),
-                    ),
-                    Positioned(
-                      bottom: 30.0,
-                      child: Container(
-                        padding: EdgeInsets.only(left: 10.0, right: 10.0),
-                        width: 250.0,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text(
-                              movies[index].title,
-                              style: TextStyle(
-                                height: 1.5,
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16.0
-                              ),
-                            )
-                          ],
+                return Padding(
+
+                  padding: const EdgeInsets.all(8.0),
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) =>
+                                  MovieDetailScreen(movie: movies[index])));
+                    },
+                    child: Stack(
+                      children: <Widget>[
+                        Container(
+                          width: MediaQuery.of(context).size.width,
+                          height: 220,
+                          decoration: BoxDecoration(
+                              shape: BoxShape.rectangle,
+                              image: DecorationImage(
+                                  image: NetworkImage(
+                                      "https://image.tmdb.org/t/p/original/" +
+                                          movies[index].backPosterPath),
+                                  fit: BoxFit.cover)),
                         ),
-                      ),
-                    )
-                  ],
+                        Container(
+                          decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                  colors: [
+                                    Stye.Colors.mainColor.withOpacity(1.0),
+                                    Stye.Colors.mainColor.withOpacity(0.0)
+                                  ],
+                                  begin: Alignment.bottomCenter,
+                                  end: Alignment.topCenter,
+                                  stops: [0.0, 0.3])),
+                        ),
+                        Positioned(
+                          top: 0,
+                          bottom: 0,
+                          right: 0,
+                          left: 0,
+                          child: Icon(
+                            FontAwesomeIcons.playCircle,
+                            color: Stye.Colors.secondColor,
+                            size: 40.0,
+                          ),
+                        ),
+                        Positioned(
+                          bottom: 30.0,
+                          child: Container(
+                            padding: EdgeInsets.only(left: 10.0, right: 10.0),
+                            width: 250.0,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: <Widget>[
+                                Text(
+                                  movies[index].title,
+                                  style: TextStyle(
+                                      height: 1.5,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16.0),
+                                )
+                              ],
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
                 );
-              }
-          ),
+              }),
           length: movies.take(5).length,
         ),
       );

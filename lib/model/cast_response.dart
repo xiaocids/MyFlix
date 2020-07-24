@@ -8,7 +8,7 @@ class CastsResponse {
 
   CastsResponse.fromJson(Map<String, dynamic> json)
       : casts =
-            (json["casts"] as List).map((i) => new Cast.fromJson(i)).toList(),
+            (json["cast"] as List).map((i) => new Cast.fromJson(i)).toList(),
         error = "";
 
   CastsResponse.withError(String errorValue)

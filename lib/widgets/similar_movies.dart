@@ -1,43 +1,53 @@
 import 'package:flutter/cupertino.dart';
 import 'package:eva_icons_flutter/eva_icons_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:my_flix/bloc/get_movies_bloc.dart';
+import 'package:my_flix/bloc/get_movie_similar_bloc.dart';
 import 'package:my_flix/screens/movie_detail_screen.dart';
 import 'package:my_flix/style/theme.dart' as Style;
 import 'package:my_flix/model/movie_response.dart';
 import 'package:my_flix/model/movie.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 
-class TopMovies extends StatefulWidget {
+class SimilarMovies extends StatefulWidget {
+  final int id;
+  SimilarMovies({Key key, @required this.id}) : super(key: key);
   @override
-  _TopMoviesState createState() => _TopMoviesState();
+  _SimilarMoviesState createState() => _SimilarMoviesState(id);
 }
 
-class _TopMoviesState extends State<TopMovies> {
+class _SimilarMoviesState extends State<SimilarMovies> {
+  final int id;
+  _SimilarMoviesState(this.id);
+
   @override
   void initState() {
     super.initState();
-    moviesBloc..getMovies();
+    similarMovieBloc..getSimilarMovies(id);
   }
 
+  @override
+  void dispose() {
+    super.dispose();
+    similarMovieBloc.drainStream();
+  }
   @override
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Padding(
-          padding: EdgeInsets.only(left: 10.0, top: 20.0),
-          child: Text("TOP RATED MOVIES", style: TextStyle(
-            color: Style.Colors.titleColor,
-            fontWeight: FontWeight.w500,
-            fontSize: 12.0
-          ),)
+            padding: EdgeInsets.only(left: 10.0, top: 20.0),
+            child: Text("SIMILAR MOVIES", style: TextStyle(
+                color: Style.Colors.titleColor,
+                fontWeight: FontWeight.w500,
+                fontSize: 12.0
+            ),)
         ),
         SizedBox(
           height: 5.0,
         ),
         StreamBuilder<MovieResponse>(
-          stream: moviesBloc.subject.stream,
+          stream: similarMovieBloc.subject.stream,
           builder: (context, AsyncSnapshot<MovieResponse> snapshot) {
             if(snapshot.hasData) {
               if(snapshot.data.error != null && snapshot.data.error.length > 0) {
